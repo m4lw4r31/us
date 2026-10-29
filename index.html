@@ -18,17 +18,34 @@
 
       html {
         -webkit-text-size-adjust: 100%;
+        background: #000;
       }
 
       body {
         margin: 0;
-        background: #000;
+        background: transparent;
         color: #f4f4f4;
         font-family: Georgia, "Palatino Linotype", Palatino, "Times New Roman",
           serif;
         min-height: 100vh;
         min-height: 100dvh;
         overflow-x: hidden;
+      }
+
+      /* FONDO: la foto de los dos, borrosa y oscurecida.
+         - Menos borroso: baja el 22px (por ejemplo 12px).
+         - Más visible: sube el brightness de 0.42 a 0.6. */
+      .fondo {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background-color: #000;
+        background-image: url("./Selina%20y%20jose.webp");
+        background-size: cover;
+        background-position: center 30%;
+        background-repeat: no-repeat;
+        filter: blur(22px) brightness(0.42) saturate(1.1);
+        transform: scale(1.12);
       }
 
       .page {
@@ -69,7 +86,8 @@
         letter-spacing: 0.06em;
         line-height: 1.2;
         text-align: center;
-        color: #f7f7f7;
+        color: #fff;
+        text-shadow: 0 0.1rem 0.9rem rgba(0, 0, 0, 0.8);
       }
 
       .foto {
@@ -86,7 +104,7 @@
         height: auto;
         max-height: min(68dvh, 34rem);
         object-fit: contain;
-        border: 1px solid rgba(255, 255, 255, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.35);
         box-shadow:
           0 0.2rem 0.5rem rgba(0, 0, 0, 0.5),
           0 1.15rem 2.5rem rgba(0, 0, 0, 0.55);
@@ -94,8 +112,8 @@
 
       .reproductor {
         width: 100%;
-        background: #000;
-        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(0, 0, 0, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.28);
         min-height: clamp(11rem, 42vw, 18rem);
         display: grid;
         place-items: center;
@@ -119,6 +137,7 @@
     </style>
   </head>
   <body>
+    <div class="fondo" aria-hidden="true"></div>
     <main class="page">
       <!-- Cambia el título aquí (usa &lt;3 si quieres el corazón <3). -->
       <h1>Te amo &lt;3</h1>
