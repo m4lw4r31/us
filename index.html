@@ -8,7 +8,7 @@
     <style>
       :root {
         color-scheme: dark;
-        --rojo: #e11d2e; /* Cambia este color si quieres otro tono de rojo */
+        --rojo: #e11d2e; /* Colores CMB */
       }
 
       *,
@@ -33,9 +33,7 @@
         overflow-x: hidden;
       }
 
-      /* FONDO: la foto de los dos, borrosa y oscurecida.
-         - Menos borroso: baja el 22px (por ejemplo 12px).
-         - Más visible: sube el brightness de 0.42 a 0.6. */
+      /* Foto borrosa, menos borrosa, bajo el 22px, mas visible subo el brightness de 0.42 a 0.6. */
       .fondo {
         position: fixed;
         inset: 0;
@@ -73,7 +71,7 @@
         }
       }
 
-      /* Cambia el título en el h1 de más abajo, no aquí. */
+      /* Cambiar el título en el h1 de más abajo, no aquí. */
       h1 {
         margin: 0;
         font-size: clamp(1.7rem, 7vw, 2.55rem);
@@ -167,7 +165,7 @@
   <body>
     <div class="fondo" aria-hidden="true"></div>
     <main class="page">
-      <!-- Cambia el título aquí (usa &lt;3 si quieres el corazón <3). -->
+      <!-- Aqui cambio el titulo :3-->
       <h1>Te amo &lt;3</h1>
 
       <figure class="foto">
@@ -193,7 +191,7 @@
         video.load();
       });
 
-      // Mantiene el borde rojo mientras el video se reproduce
+      // Esto para mantener el borde rojo mientras el video se reproduce
       video.addEventListener("play", () => caja.classList.add("reproduciendo"));
       video.addEventListener("pause", () =>
         caja.classList.remove("reproduciendo")
