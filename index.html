@@ -8,6 +8,7 @@
     <style>
       :root {
         color-scheme: dark;
+        --rojo: #e11d2e; /* Cambia este color si quieres otro tono de rojo */
       }
 
       *,
@@ -72,12 +73,6 @@
         }
       }
 
-      @media (prefers-reduced-motion: reduce) {
-        .page {
-          animation: none;
-        }
-      }
-
       /* Cambia el título en el h1 de más abajo, no aquí. */
       h1 {
         margin: 0;
@@ -110,13 +105,34 @@
           0 1.15rem 2.5rem rgba(0, 0, 0, 0.55);
       }
 
+      /* REPRODUCTOR: borde normal, y rojo con resplandor al pasar el cursor,
+         al tocarlo en el celular o mientras el video está sonando. */
       .reproductor {
         width: 100%;
-        background: rgba(0, 0, 0, 0.82);
+        background: rgba(10, 10, 10, 0.88);
         border: 1px solid rgba(255, 255, 255, 0.28);
         min-height: clamp(11rem, 42vw, 18rem);
         display: grid;
         place-items: center;
+        transition:
+          border-color 0.3s ease,
+          box-shadow 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .reproductor:hover,
+      .reproductor:focus-within,
+      .reproductor:active,
+      .reproductor.reproduciendo {
+        border-color: var(--rojo);
+        box-shadow:
+          0 0 0 1px rgba(225, 29, 46, 0.55),
+          0 0 1.6rem rgba(225, 29, 46, 0.45),
+          0 0 3.5rem rgba(225, 29, 46, 0.2);
+      }
+
+      .reproductor:hover {
+        transform: translateY(-2px);
       }
 
       .reproductor video {
@@ -132,6 +148,18 @@
         .page {
           width: min(100% - 2rem, 38rem);
           padding-block: 3.25rem 4rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .page {
+          animation: none;
+        }
+        .reproductor {
+          transition: none;
+        }
+        .reproductor:hover {
+          transform: none;
         }
       }
     </style>
@@ -158,10 +186,21 @@
     </main>
     <script>
       const video = document.querySelector("video");
+      const caja = document.querySelector(".reproductor");
+
       video.addEventListener("error", () => {
         video.removeAttribute("src");
         video.load();
       });
+
+      // Mantiene el borde rojo mientras el video se reproduce
+      video.addEventListener("play", () => caja.classList.add("reproduciendo"));
+      video.addEventListener("pause", () =>
+        caja.classList.remove("reproduciendo")
+      );
+      video.addEventListener("ended", () =>
+        caja.classList.remove("reproduciendo")
+      );
     </script>
   </body>
 </html>
