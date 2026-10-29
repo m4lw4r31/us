@@ -8,7 +8,7 @@
     <style>
       :root {
         color-scheme: dark;
-        --rojo: #e11d2e; /* Colores CMB */
+        --rojo: #e11d2e; /* Cambia este color si quieres otro tono de rojo */
       }
 
       *,
@@ -33,7 +33,9 @@
         overflow-x: hidden;
       }
 
-      /* Foto borrosa, menos borrosa, bajo el 22px, mas visible subo el brightness de 0.42 a 0.6. */
+      /* FONDO: la foto de los dos, borrosa y oscurecida.
+         - Menos borroso: baja el 22px (por ejemplo 12px).
+         - Más visible: sube el brightness de 0.42 a 0.6. */
       .fondo {
         position: fixed;
         inset: 0;
@@ -43,10 +45,11 @@
         background-size: cover;
         background-position: center 30%;
         background-repeat: no-repeat;
-        filter: blur(18px) brightness(0.42) saturate(1.1);
+        filter: blur(22px) brightness(0.42) saturate(1.1);
         transform: scale(1.12);
       }
 
+      /* justify-content: center centra todo el contenido en vertical */
       .page {
         width: min(100%, 36rem);
         margin-inline: auto;
@@ -56,6 +59,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         gap: clamp(1.25rem, 4.5vw, 2rem);
         animation: entrar 0.9s ease both;
       }
@@ -71,7 +75,7 @@
         }
       }
 
-      /* Cambiar el título en el h1 de más abajo, no aquí. */
+      /* Cambia el título en el h1 de más abajo, no aquí. */
       h1 {
         margin: 0;
         font-size: clamp(1.7rem, 7vw, 2.55rem);
@@ -95,7 +99,7 @@
         max-width: 100%;
         width: auto;
         height: auto;
-        max-height: min(68dvh, 34rem);
+        max-height: min(60dvh, 30rem);
         object-fit: contain;
         border: 1px solid rgba(255, 255, 255, 0.35);
         box-shadow:
@@ -107,6 +111,7 @@
          al tocarlo en el celular o mientras el video está sonando. */
       .reproductor {
         width: 100%;
+        margin-top: clamp(0.75rem, 5vh, 2.5rem); /* lo baja un poco */
         background: rgba(10, 10, 10, 0.88);
         border: 1px solid rgba(255, 255, 255, 0.28);
         min-height: clamp(11rem, 42vw, 18rem);
@@ -165,7 +170,7 @@
   <body>
     <div class="fondo" aria-hidden="true"></div>
     <main class="page">
-      <!-- Aqui cambio el titulo :3-->
+      <!-- Cambia el título aquí (usa &lt;3 si quieres el corazón <3). -->
       <h1>Te amo &lt;3</h1>
 
       <figure class="foto">
@@ -185,20 +190,61 @@
     <script>
       const video = document.querySelector("video");
       const caja = document.querySelector(".reproductor");
+      // true en celulares y tablets (pantallas táctiles)
+      const esCelular = window.matchMedia("(pointer: coarse)").matches;
 
       video.addEventListener("error", () => {
         video.removeAttribute("src");
         video.load();
       });
 
-      // Esto para mantener el borde rojo mientras el video se reproduce
-      video.addEventListener("play", () => caja.classList.add("reproduciendo"));
+      // En celular: pantalla completa y, si el video es horizontal, gira a horizontal
+      function pantallaCompletaHorizontal() {
+        if (!esCelular) return;
+        // Si el video es vertical, no se fuerza la rotación
+        if (video.videoWidth && video.videoHeight > video.videoWidth) return;
+
+        if (video.requestFullscreen) {
+          // Android / Chrome
+          video
+            .requestFullscreen()
+            .then(() => {
+              if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock("landscape").catch(() => {});
+              }
+            })
+            .catch(() => {});
+        } else if (video.webkitEnterFullscreen) {
+          // iPhone / Safari: abre pantalla completa (gira al inclinar el teléfono)
+          try {
+            video.webkitEnterFullscreen();
+          } catch (e) {}
+        }
+      }
+
+      video.addEventListener("play", () => {
+        caja.classList.add("reproduciendo");
+        pantallaCompletaHorizontal();
+      });
       video.addEventListener("pause", () =>
         caja.classList.remove("reproduciendo")
       );
       video.addEventListener("ended", () =>
         caja.classList.remove("reproduciendo")
       );
+
+      // Al salir de pantalla completa, libera la rotación
+      document.addEventListener("fullscreenchange", () => {
+        if (
+          !document.fullscreenElement &&
+          screen.orientation &&
+          screen.orientation.unlock
+        ) {
+          try {
+            screen.orientation.unlock();
+          } catch (e) {}
+        }
+      });
     </script>
   </body>
 </html>
