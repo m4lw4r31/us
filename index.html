@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Te amo &lt;3</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: #000;
+        color: #f4f4f4;
+        font-family: Georgia, "Palatino Linotype", Palatino, "Times New Roman",
+          serif;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-x: hidden;
+      }
+
+      .page {
+        width: min(100%, 36rem);
+        margin-inline: auto;
+        padding: 1.75rem 1rem 2.75rem;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(1.25rem, 4.5vw, 2rem);
+        animation: entrar 0.9s ease both;
+      }
+
+      @keyframes entrar {
+        from {
+          opacity: 0;
+          transform: translateY(0.8rem);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .page {
+          animation: none;
+        }
+      }
+
+      /* Cambia el título en el h1 de más abajo, no aquí. */
+      h1 {
+        margin: 0;
+        font-size: clamp(1.7rem, 7vw, 2.55rem);
+        font-weight: 400;
+        letter-spacing: 0.06em;
+        line-height: 1.2;
+        text-align: center;
+        color: #f7f7f7;
+      }
+
+      .foto {
+        margin: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .foto img {
+        display: block;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        max-height: min(68dvh, 34rem);
+        object-fit: contain;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        box-shadow:
+          0 0.2rem 0.5rem rgba(0, 0, 0, 0.5),
+          0 1.15rem 2.5rem rgba(0, 0, 0, 0.55);
+      }
+
+      .reproductor {
+        width: 100%;
+        background: #000;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        min-height: clamp(11rem, 42vw, 18rem);
+        display: grid;
+        place-items: center;
+      }
+
+      .reproductor video {
+        width: 100%;
+        height: auto;
+        max-height: min(62dvh, 28rem);
+        object-fit: contain;
+        background: #000;
+        display: block;
+      }
+
+      @media (min-width: 56.25em) {
+        .page {
+          width: min(100% - 2rem, 38rem);
+          padding-block: 3.25rem 4rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <!-- Cambia el título aquí (usa &lt;3 si quieres el corazón <3). -->
+      <h1>Te amo &lt;3</h1>
+
+      <figure class="foto">
+        <img src="./foto.jpeg" alt="Foto" />
+      </figure>
+
+      <div class="reproductor">
+        <video
+          src="./video.mp4"
+          controls
+          playsinline
+          webkit-playsinline
+          preload="metadata"
+        ></video>
+      </div>
+    </main>
+    <script>
+      const video = document.querySelector("video");
+      video.addEventListener("error", () => {
+        video.removeAttribute("src");
+        video.load();
+      });
+    </script>
+  </body>
+</html>
