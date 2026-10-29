@@ -107,8 +107,8 @@
           0 1.15rem 2.5rem rgba(0, 0, 0, 0.55);
       }
 
-      /* REPRODUCTOR: borde normal, y rojo con resplandor al pasar el cursor,
-         al tocarlo en el celular o mientras el video está sonando. */
+      /* REPRODUCTOR: el borde se pone rojo SOLO mientras el cursor está encima
+         (o mientras lo tocas en el celular). Al sacar el cursor vuelve a normal. */
       .reproductor {
         width: 100%;
         margin-top: clamp(0.75rem, 5vh, 2.5rem); /* lo baja un poco */
@@ -123,19 +123,25 @@
           transform 0.3s ease;
       }
 
-      .reproductor:hover,
-      .reproductor:focus-within,
-      .reproductor:active,
-      .reproductor.reproduciendo {
+      /* Pantallas con ratón (PC) */
+      @media (hover: hover) {
+        .reproductor:hover {
+          border-color: var(--rojo);
+          box-shadow:
+            0 0 0 1px rgba(225, 29, 46, 0.55),
+            0 0 1.6rem rgba(225, 29, 46, 0.45),
+            0 0 3.5rem rgba(225, 29, 46, 0.2);
+          transform: translateY(-2px);
+        }
+      }
+
+      /* Celular: solo mientras lo tocas */
+      .reproductor:active {
         border-color: var(--rojo);
         box-shadow:
           0 0 0 1px rgba(225, 29, 46, 0.55),
           0 0 1.6rem rgba(225, 29, 46, 0.45),
           0 0 3.5rem rgba(225, 29, 46, 0.2);
-      }
-
-      .reproductor:hover {
-        transform: translateY(-2px);
       }
 
       .reproductor video {
@@ -189,7 +195,6 @@
     </main>
     <script>
       const video = document.querySelector("video");
-      const caja = document.querySelector(".reproductor");
       // true en celulares y tablets (pantallas táctiles)
       const esCelular = window.matchMedia("(pointer: coarse)").matches;
 
@@ -222,16 +227,7 @@
         }
       }
 
-      video.addEventListener("play", () => {
-        caja.classList.add("reproduciendo");
-        pantallaCompletaHorizontal();
-      });
-      video.addEventListener("pause", () =>
-        caja.classList.remove("reproduciendo")
-      );
-      video.addEventListener("ended", () =>
-        caja.classList.remove("reproduciendo")
-      );
+      video.addEventListener("play", pantallaCompletaHorizontal);
 
       // Al salir de pantalla completa, libera la rotación
       document.addEventListener("fullscreenchange", () => {
