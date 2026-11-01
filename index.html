@@ -170,6 +170,15 @@
         display: block;
       }
 
+      /* Video de YouTube (usa el mismo borde rojo del reproductor) */
+      .reproductor iframe {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border: 0;
+        background: #000;
+      }
+
       @media (min-width: 56.25em) {
         .page {
           width: min(100% - 2rem, 38rem);
@@ -208,6 +217,16 @@
           webkit-playsinline
           preload="metadata"
         ></video>
+      </div>
+
+      <div class="reproductor">
+        <iframe
+          src="https://www.youtube.com/embed/UwWzqv-wlbw?rel=0&playsinline=1"
+          title="Esteban y Sel"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
       </div>
     </main>
     <script>
