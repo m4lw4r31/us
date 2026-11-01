@@ -104,36 +104,12 @@
         text-shadow: 0 0.1rem 0.9rem rgba(0, 0, 0, 0.8);
       }
 
-      .foto {
-        margin: 0;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-      }
-
-      .foto img {
-        display: block;
-        max-width: 100%;
-        width: auto;
-        height: auto;
-        max-height: min(60dvh, 30rem);
-        object-fit: contain;
-        border: 1px solid rgba(255, 255, 255, 0.35);
-        box-shadow:
-          0 0.2rem 0.5rem rgba(0, 0, 0, 0.5),
-          0 1.15rem 2.5rem rgba(0, 0, 0, 0.55);
-      }
-
       /* REPRODUCTOR: el borde se pone rojo SOLO mientras el cursor está encima
          (o mientras lo tocas en el celular). Al sacar el cursor vuelve a normal. */
       .reproductor {
         width: 100%;
-        margin-top: clamp(0.75rem, 5vh, 2.5rem); /* lo baja un poco */
         background: rgba(10, 10, 10, 0.88);
         border: 1px solid rgba(255, 255, 255, 0.28);
-        min-height: clamp(11rem, 42vw, 18rem);
-        display: grid;
-        place-items: center;
         transition:
           border-color 0.3s ease,
           box-shadow 0.3s ease,
@@ -161,16 +137,7 @@
           0 0 3.5rem rgba(225, 29, 46, 0.2);
       }
 
-      .reproductor video {
-        width: 100%;
-        height: auto;
-        max-height: min(62dvh, 28rem);
-        object-fit: contain;
-        background: #000;
-        display: block;
-      }
-
-      /* Video de YouTube (usa el mismo borde rojo del reproductor) */
+      /* Video de YouTube en proporción 16:9 */
       .reproductor iframe {
         display: block;
         width: 100%;
@@ -205,23 +172,11 @@
       <!-- Cambia el título aquí (usa &lt;3 si quieres el corazón <3). -->
       <h1>Te amo &lt;3</h1>
 
-      <figure class="foto">
-        <img src="./foto.jpeg" alt="Foto" />
-      </figure>
-
-      <div class="reproductor">
-        <video
-          src="./video.mp4"
-          controls
-          playsinline
-          webkit-playsinline
-          preload="metadata"
-        ></video>
-      </div>
-
+      <!-- VIDEO: para cambiarlo, reemplaza el ID UwWzqv-wlbw por el de otro video de YouTube. -->
       <div class="reproductor">
         <iframe
-          src="https://www.youtube.com/embed/UwWzqv-wlbw?rel=0&playsinline=1"
+          id="yt"
+          src="https://www.youtube.com/embed/UwWzqv-wlbw?enablejsapi=1&rel=0&playsinline=1"
           title="Esteban y Sel"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen
@@ -229,55 +184,8 @@
         ></iframe>
       </div>
     </main>
+
     <script>
-      const video = document.querySelector("video");
-      // true en celulares y tablets (pantallas táctiles)
-      const esCelular = window.matchMedia("(pointer: coarse)").matches;
-
-      video.addEventListener("error", () => {
-        video.removeAttribute("src");
-        video.load();
-      });
-
-      // En celular: pantalla completa y, si el video es horizontal, gira a horizontal
-      function pantallaCompletaHorizontal() {
-        if (!esCelular) return;
-        // Si el video es vertical, no se fuerza la rotación
-        if (video.videoWidth && video.videoHeight > video.videoWidth) return;
-
-        if (video.requestFullscreen) {
-          // Android / Chrome
-          video
-            .requestFullscreen()
-            .then(() => {
-              if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock("landscape").catch(() => {});
-              }
-            })
-            .catch(() => {});
-        } else if (video.webkitEnterFullscreen) {
-          // iPhone / Safari: abre pantalla completa (gira al inclinar el teléfono)
-          try {
-            video.webkitEnterFullscreen();
-          } catch (e) {}
-        }
-      }
-
-      video.addEventListener("play", pantallaCompletaHorizontal);
-
-      // Al salir de pantalla completa, libera la rotación
-      document.addEventListener("fullscreenchange", () => {
-        if (
-          !document.fullscreenElement &&
-          screen.orientation &&
-          screen.orientation.unlock
-        ) {
-          try {
-            screen.orientation.unlock();
-          } catch (e) {}
-        }
-      });
-
       // ESTADÍSTICAS: eventos del video que se ven en Microsoft Clarity
       function registrarEvento(nombre) {
         if (typeof window.clarity === "function") {
@@ -285,20 +193,53 @@
         }
       }
 
-      video.addEventListener("play", () => registrarEvento("video_play"));
-      video.addEventListener("ended", () => registrarEvento("video_completo"));
-
       const hitos = new Set();
-      video.addEventListener("timeupdate", () => {
-        if (!video.duration) return;
-        const pct = (video.currentTime / video.duration) * 100;
+      let reproduciendo = false;
+      let temporizador = null;
+      let player = null;
+
+      function revisarProgreso() {
+        if (!player || !player.getDuration) return;
+        const dur = player.getDuration();
+        if (!dur) return;
+        const pct = (player.getCurrentTime() / dur) * 100;
         for (const h of [25, 50, 75]) {
           if (pct >= h && !hitos.has(h)) {
             hitos.add(h);
             registrarEvento("video_" + h);
           }
         }
-      });
+      }
+
+      function alCambiarEstado(e) {
+        // 1 = reproduciendo, 2 = pausa, 0 = terminó
+        if (e.data === 1) {
+          if (!reproduciendo) {
+            reproduciendo = true;
+            registrarEvento("video_play");
+          }
+          if (!temporizador) temporizador = setInterval(revisarProgreso, 1000);
+        } else {
+          if (temporizador) {
+            clearInterval(temporizador);
+            temporizador = null;
+          }
+          if (e.data === 0) {
+            registrarEvento("video_completo");
+            reproduciendo = false;
+          }
+        }
+      }
+
+      // API de YouTube (si falla, el video igual se ve y se reproduce)
+      window.onYouTubeIframeAPIReady = function () {
+        player = new YT.Player("yt", {
+          events: { onStateChange: alCambiarEstado },
+        });
+      };
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(tag);
     </script>
   </body>
 </html>
